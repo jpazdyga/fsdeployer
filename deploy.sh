@@ -28,12 +28,12 @@ dockeros() {
 
 	cd docker
 	cleanup
-	echo -e "FROM centos\nMAINTAINER $maintainer\nRUN yum -y install epel-release\nRUN yum -y update ; yum -y install python-setuptools python-pip" > Dockerfile
+	echo -e "FROM jpazdyga/centos7-base\nMAINTAINER $maintainer\n" > Dockerfile
         for package in `ls ../ops/`;
 	do
 		echo -e "RUN yum -y install $package" >> Dockerfile
 	done
-	echo -e "RUN rm -rf /var/cache/yum/* && yum clean all\nRUN pip install supervisor\nRUN mkdir -p /etc/supervisor.d/\nCOPY supervisord.conf /etc/supervisor.d/supervisord.conf\n" >> Dockerfile
+	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\n" >> Dockerfile
 
 }
 
@@ -48,7 +48,7 @@ dockerdirs() {
 		target=`echo $configfile | cut -d/ -f4- | sed 's|^|/etc\/|g'`
 		echo "ADD $configfile $target" >> Dockerfile
 	done
-	echo -e "VOLUME /var/log $wwwpath2sub/\nENV DATE_TIMEZONE UTC\nEXPOSE 80 443\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]" >> Dockerfile
+	echo -e "VOLUME $wwwpath2sub/\nENV DATE_TIMEZONE UTC\nEXPOSE 80 443\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]" >> Dockerfile
 
 }
 
