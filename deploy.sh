@@ -2,13 +2,15 @@
 
 if [ -z "$1" ];
 then
-	echo "Please specify domain name as an argument."
+	echo "Please specify git url to clone as first argument and a domain name as a second:"
+	echo "$0 git@github.com:jpazdyga/testapp.git pazdyga.pl"
 	exit 1
 fi
 
 email2sub="jakub.pazdyga@ft.com"
 maintainer="Jakub Pazdyga <$email2sub>"
-domainname2sub="$1"
+giturl="$1"
+domainname2sub="$2"
 wwwpath2sub='/var/www'
 vhosttmpldir="ops/httpd/httpd/conf.d"
 
@@ -22,6 +24,23 @@ dockerbake() {
 	sudo docker run --name apache_$shortname2sub -d -p 80:80 apache_$shortname2sub-img
 	cleanup
 	cd ..
+}
+
+getappcode() {
+
+	subdir=`echo \"$giturl\" | awk -F'/' '{print \$NF}' | cut -d. -f1`
+	if [ ! -z ./ops ] && [ ! -z ./dev ];
+	then
+		mv $subdir $subdir.old
+		git clone $giturl
+		ln -s $subdir/ops ./ops
+		ln -s $subdir/dev ./dev
+		return 0
+	else
+		rm -fr subdir ops dev
+		getappcode
+	fi
+
 }
 
 dockeros() {
@@ -73,7 +92,8 @@ imageprep() {
 
 }
 
+getappcode
 dockeros
 imageprep
 dockerdirs
-dockerbake
+#dockerbake
