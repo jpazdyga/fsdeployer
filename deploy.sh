@@ -29,6 +29,7 @@ dockerbake() {
 getappcode() {
 
 	subdir=`echo \"$giturl\" | awk -F'/' '{print \$NF}' | cut -d. -f1`
+	#TODO: try https:// if git:// not usable: echo "git@github.com:jpazdyga/fsdeployer.git" | sed -e 's/github.com:/github.com\//g' -e 's/git@/https:\/\//g'
 	if [ ! -z ./ops ] && [ ! -z ./dev ];
 	then
 		mv $subdir $subdir.old
@@ -96,4 +97,4 @@ getappcode
 dockeros
 imageprep
 dockerdirs
-#dockerbake
+dockerbake
