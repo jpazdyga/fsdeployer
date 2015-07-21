@@ -51,7 +51,7 @@ dockeros() {
 	echo -e "FROM jpazdyga/centos7-base\nMAINTAINER $maintainer\n" > Dockerfile
         for package in `ls ../ops/`;
 	do
-		echo -e "RUN yum -y install $package" >> Dockerfile
+		echo -e "RUN yum -y install $package; yum clean all" >> Dockerfile
 	done
 	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\n" >> Dockerfile
 
