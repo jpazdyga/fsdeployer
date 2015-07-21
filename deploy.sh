@@ -69,7 +69,7 @@ dockerdirs() {
 		target=`echo $configfile | cut -d/ -f4- | sed 's|^|/etc\/|g'`
 		echo "ADD $configfile $target" >> Dockerfile
 	done
-	echo -e "VOLUME $wwwpath2sub/\nENV DATE_TIMEZONE UTC\nEXPOSE 80 443\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]" >> Dockerfile
+	echo -e "VOLUME $wwwpath2sub /var/log\nENV DATE_TIMEZONE UTC\nEXPOSE 80 443\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]" >> Dockerfile
 
 }
 
