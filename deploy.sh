@@ -62,7 +62,10 @@ dockerdirs() {
 
 	for directory in `find ./ops/ -mindepth 2 -type d | cut -d/ -f4-`;
 	do
-		echo "RUN mkdir -p /etc/$directory" >> Dockerfile
+		if [ ! -d /etc/$directory ];
+		then
+			echo "RUN mkdir -p /etc/$directory" >> Dockerfile
+		fi
 	done
 	for configfile in `find ./ops/ -mindepth 2 -type f`;
 	do
