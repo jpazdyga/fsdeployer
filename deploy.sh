@@ -27,40 +27,35 @@ dockerbake() {
 }
 
 getappcode() {
-
 	subdir=`echo \"$giturl\" | awk -F'/' '{print \$NF}' | cut -d. -f1`
 	#TODO: try https:// if git:// not usable: echo "git@github.com:jpazdyga/fsdeployer.git" | sed -e 's/github.com:/github.com\//g' -e 's/git@/https:\/\//g'
-	if [ ! -z ./ops ] && [ ! -z ./dev ];
+	if [ ! -z ./ops ] || [ ! -z ./dev ] || [ ! -z ./$subdir ];
 	then
-		mv $subdir $subdir.old
+		rm -fr $subdir
 		git clone $giturl
-		ln -s $subdir/ops ./ops
-		ln -s $subdir/dev ./dev
+		ln -s $subdir/ops ./
+		ln -s $subdir/dev ./
 		return 0
 	else
 		rm -fr subdir ops dev
 		getappcode
 	fi
-
 }
 
 dockeros() {
-
 	cd docker
 	cleanup
+	test="test5"
 	echo -e "FROM jpazdyga/centos7-base\nMAINTAINER $maintainer\n" > Dockerfile
-	echo -e "RUN yum clean all" >> Dockerfile
-        for package in `ls ../ops/`;
+	echo -e "RUN touch /var/lib/rpm/*\nRUN yum clean all #$test" >> Dockerfile
+	for package in `ls ../ops/`;
 	do
-		echo -e "NOCACHE" >> Dockerfile
-		echo -e "RUN yum -y install $package; yum clean all" >> Dockerfile
+		echo -e "RUN yum -y install $package; yum clean all #$test" >> Dockerfile
 	done
 	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\n" >> Dockerfile
-
 }
 
 dockerdirs() {
-
 	for directory in `find ./ops/ -mindepth 2 -type d | cut -d/ -f4-`;
 	do
 		if [ ! -d /etc/$directory ];
@@ -68,13 +63,12 @@ dockerdirs() {
 			echo "RUN mkdir -p /etc/$directory" >> Dockerfile
 		fi
 	done
-	#for configfile in `find ./ops/ -mindepth 2 -type f`;
-	#do
-#		target=`echo $configfile | cut -d/ -f4- | sed 's|^|/etc\/|g'`
-#		echo "COPY $configfile $target" >> Dockerfile
-#	done
+	for configfile in `find ./ops/ -mindepth 2 -type f`;
+	do
+		target=`echo $configfile | cut -d/ -f4- | sed 's|^|/etc\/|g'`
+		echo "ADD $configfile $target" >> Dockerfile
+	done
 	echo -e "VOLUME $wwwpath2sub /var/log\nENV DATE_TIMEZONE UTC\nEXPOSE 80 443\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]" >> Dockerfile
-
 }
 
 dockervhost() {
@@ -86,7 +80,6 @@ vhostcreate() {
 }
 
 imageprep() {
-
 	cp -rp ../ops/ ./
 	for shortname2sub in `ls -d ../dev/* | grep root | awk -F '_' '{print $2}'`;
 	do
@@ -95,7 +88,6 @@ imageprep() {
 		dockervhost
 	done
 	rm -f $vhosttmpldir/vhosts.conf
-
 }
 
 getappcode
