@@ -52,6 +52,7 @@ dockeros() {
 	echo -e "RUN yum clean all" >> Dockerfile
         for package in `ls ../ops/`;
 	do
+		echo -e "NOCACHE" >> Dockerfile
 		echo -e "RUN yum -y install $package; yum clean all" >> Dockerfile
 	done
 	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\n" >> Dockerfile
