@@ -28,7 +28,11 @@ dockerbake() {
 
 getappcode() {
 	subdir=`echo \"$giturl\" | awk -F'/' '{print \$NF}' | cut -d. -f1`
-	#TODO: try https:// if git:// not usable: echo "git@github.com:jpazdyga/fsdeployer.git" | sed -e 's/github.com:/github.com\//g' -e 's/git@/https:\/\//g'
+	gitproto=`ncat -i0.2 -w1 --send-only github.com 9418 2>&1 | grep "timed out"`
+	if [ ! -z "$gitproto" ];
+	then
+		giturl=`echo "$giturl" | sed -e 's/github.com:/github.com\//g' -e 's/git@/https:\/\//g'`
+	fi
 	if [ ! -z ./ops ] || [ ! -z ./dev ] || [ ! -z ./$subdir ];
 	then
 		rm -fr $subdir
