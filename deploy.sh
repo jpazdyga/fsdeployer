@@ -51,7 +51,7 @@ dockeros() {
 	cleanup
 	test="test5"
 	echo -e "FROM jpazdyga/centos7-base\nMAINTAINER $maintainer\n" > Dockerfile
-	echo -e "RUN touch /var/lib/rpm/*\nRUN yum clean all #$test" >> Dockerfile
+	echo -e "RUN yum clean all #$test" >> Dockerfile
 	for package in `ls ../ops/`;
 	do
 		echo -e "RUN yum -y install $package; yum clean all #$test" >> Dockerfile
