@@ -49,8 +49,9 @@ getappcode() {
 dockeros() {
 	cd docker
 	cleanup
-	test="test5"
+	test="test1"
 	echo -e "FROM jpazdyga/centos7-base\nMAINTAINER $maintainer\n" > Dockerfile
+	echo -e "VOLUME $wwwpath2sub /var/log /etc\n" >> Dockerfile
 	echo -e "RUN yum clean all #$test" >> Dockerfile
 	for package in `ls ../ops/`;
 	do
@@ -72,7 +73,7 @@ dockerdirs() {
 		target=`echo $configfile | cut -d/ -f4- | sed 's|^|/etc\/|g'`
 		echo "ADD $configfile $target" >> Dockerfile
 	done
-	echo -e "VOLUME $wwwpath2sub /var/log\nENV DATE_TIMEZONE UTC\nEXPOSE 80 443\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]" >> Dockerfile
+	echo -e "ENV container docker\nENV DATE_TIMEZONE UTC\nEXPOSE 80 443\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]" >> Dockerfile
 }
 
 dockervhost() {
