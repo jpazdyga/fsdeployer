@@ -49,10 +49,12 @@ dockeros() {
 	cd docker
 	cleanup
 	echo -e "FROM jpazdyga/centos7-base\nMAINTAINER $maintainer\n" > Dockerfile
-	echo -e "RUN yum clean all" >> Dockerfile
+	echo -e "ENV container docker\n" >> Dockerfile
+	echo -e "VOLUME /etc $wwwpath2sub /var/log\nENV DATE_TIMEZONE UTC\n" >> Dockerfil
+	echo -e "RUN yum clean all\n" >> Dockerfile
         for package in `ls ../ops/`;
 	do
-		echo -e "RUN yum -y install $package; yum clean all" >> Dockerfile
+		echo -e "RUN yum -y install $package; yum clean all\n" >> Dockerfile
 	done
 	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\n" >> Dockerfile
 
@@ -64,15 +66,15 @@ dockerdirs() {
 	do
 		if [ ! -d /etc/$directory ];
 		then
-			echo "RUN mkdir -p /etc/$directory" >> Dockerfile
+			echo "RUN mkdir -p /etc/$directory\n" >> Dockerfile
 		fi
 	done
 	for configfile in `find ./ops/ -mindepth 2 -type f`;
 	do
 		target=`echo $configfile | cut -d/ -f4- | sed 's|^|/etc\/|g'`
-		echo "COPY $configfile $target" >> Dockerfile
+		echo "COPY $configfile $target\n" >> Dockerfile
 	done
-	echo -e "VOLUME $wwwpath2sub /var/log\nENV DATE_TIMEZONE UTC\nEXPOSE 80 443\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]" >> Dockerfile
+	echo -e "EXPOSE 80 443\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]\n" >> Dockerfile
 
 }
 
