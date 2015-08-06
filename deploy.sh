@@ -20,7 +20,7 @@ cleanup() {
 }
 
 dockerbake() {
-	sudo docker build -t apache_$shortname2sub-img .
+	sudo docker build --no-cache=true -t apache_$shortname2sub-img .
 	sudo docker run --name apache_$shortname2sub -d -p 80:80 apache_$shortname2sub-img
 	cleanup
 	cd ..
@@ -52,10 +52,10 @@ dockeros() {
 	test="test1"
 	echo -e "FROM jpazdyga/centos7-base\nMAINTAINER $maintainer\n" > Dockerfile
 	echo -e "VOLUME $wwwpath2sub /var/log /etc\n" >> Dockerfile
-	echo -e "RUN yum clean all #$test" >> Dockerfile
+	echo -e "RUN rpmdb --rebuilddb; rpmdb --initdb; yum clean all #$test" >> Dockerfile
 	for package in `ls ../ops/`;
 	do
-		echo -e "RUN yum -y install $package; yum clean all #$test" >> Dockerfile
+		echo -e "RUN yum -y install $package; yum clean all; ls -la /etc/$package #$test" >> Dockerfile
 	done
 	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\n" >> Dockerfile
 }
