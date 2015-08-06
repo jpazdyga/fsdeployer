@@ -51,12 +51,13 @@ dockeros() {
 	cleanup
 	test="test1"
 	echo -e "FROM jpazdyga/centos7-base\nMAINTAINER $maintainer\n" > Dockerfile
-	echo -e "VOLUME $wwwpath2sub /var/log /etc\n" >> Dockerfile
 	echo -e "RUN rpmdb --rebuilddb; rpmdb --initdb; yum clean all #$test" >> Dockerfile
+	echo -e "RUN yum -y install \\" >> Dockerfile
 	for package in `ls ../ops/`;
 	do
-		echo -e "RUN yum -y install $package; yum clean all; ls -la /etc/$package #$test" >> Dockerfile
+		echo -e "    $package \\" >> Dockerfile
 	done
+	echo -e "; yum clean all; ls -la /etc/httpd/ #$test" >> Dockerfile
 	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\n" >> Dockerfile
 }
 
@@ -68,12 +69,13 @@ dockerdirs() {
 			echo "RUN mkdir -p /etc/$directory" >> Dockerfile
 		fi
 	done
+	echo -e "RUN mkdir -p /var/log/httpd\n" >> Dockerfile
 	for configfile in `find ./ops/ -mindepth 2 -type f`;
 	do
 		target=`echo $configfile | cut -d/ -f4- | sed 's|^|/etc\/|g'`
 		echo "ADD $configfile $target" >> Dockerfile
 	done
-	echo -e "ENV container docker\nENV DATE_TIMEZONE UTC\nEXPOSE 80 443\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]" >> Dockerfile
+	echo -e "ENV container docker\nENV DATE_TIMEZONE UTC\nEXPOSE 80\nVOLUME $wwwpath2sub /etc\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]" >> Dockerfile
 }
 
 dockervhost() {
