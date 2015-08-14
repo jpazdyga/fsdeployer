@@ -39,6 +39,7 @@ getappcode() {
 			giturl=`echo "$giturl" | sed -e 's/github.com:/github.com\//g' -e 's/git@/https:\/\//g'`
 		fi
 	fi
+	echo "Giturl: $giturl"
 	if [ ! -z ./ops ] || [ ! -z ./dev ] || [ ! -z ./$subdir ];
 	then
 		rm -fr $subdir
