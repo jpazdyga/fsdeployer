@@ -34,7 +34,7 @@ getappcode() {
 		giturl=`echo "$giturl" | sed -e 's/github.com:/github.com\//g' -e 's/git@/https:\/\//g'`
 	else
 		gitcheck=`git clone git@github.com:jpazdyga/testapp.git 2>1 > /dev/null ; echo $?`
-		if [ "$gitcheck" -eq "128" ];
+		if [ "$gitcheck" -ne "0" ];
 		then
 			giturl=`echo "$giturl" | sed -e 's/github.com:/github.com\//g' -e 's/git@/https:\/\//g'`
 		fi
