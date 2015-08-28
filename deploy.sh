@@ -13,48 +13,65 @@ cleanup() {
 }
 
 dockerbake() {
-	sudo docker build -t apache_$shortname2sub-img .
+	sudo docker build --no-cache=true -t apache_$shortname2sub-img .
 	sudo docker run --name apache_$shortname2sub -d -p 80:80 apache_$shortname2sub-img
 	cleanup
 	cd ..
 }
 
 getappcode() {
-
 	subdir=`echo \"$giturl\" | awk -F'/' '{print \$NF}' | cut -d. -f1`
-	#TODO: try https:// if git:// not usable: echo "git@github.com:jpazdyga/fsdeployer.git" | sed -e 's/github.com:/github.com\//g' -e 's/git@/https:\/\//g'
-	if [ ! -z ./ops ] && [ ! -z ./dev ];
+	gitproto=`ncat -i0.2 -w1 --send-only github.com 9418 2>&1 | grep "timed out"`
+	if [ ! -z "$gitproto" ];
 	then
-		mv $subdir $subdir.old
+		giturl=`echo "$giturl" | sed -e 's/github.com:/github.com\//g' -e 's/git@/https:\/\//g'`
+	else
+		gitcheck=`git clone git@github.com:jpazdyga/testapp.git 2>1 > /dev/null ; echo $?`
+		echo "Git protocol test result: $gitcheck"
+		if [ "$gitcheck" -ne "0" ];
+		then
+			giturl=`echo "$giturl" | sed -e 's/github.com:/github.com\//g' -e 's/git@/https:\/\//g'`
+		fi
+	fi
+	echo "Giturl: $giturl"
+	if [ ! -z ./ops ] || [ ! -z ./dev ] || [ ! -z ./$subdir ];
+	then
+		rm -fr $subdir
 		git clone $giturl
-		ln -s $subdir/ops ./ops
-		ln -s $subdir/dev ./dev
+		ln -s $subdir/ops ./
+		ln -s $subdir/dev ./
 		return 0
 	else
 		rm -fr subdir ops dev
 		getappcode
 	fi
-
 }
 
 dockeros() {
-
 	cd docker
 	cleanup
+	test="test1"
 	echo -e "FROM jpazdyga/centos7-base\nMAINTAINER $maintainer\n" > Dockerfile
+<<<<<<< HEAD
 	echo -e "ENV container docker\n" >> Dockerfile
 	echo -e "VOLUME /etc $wwwpath2sub /var/log\nENV DATE_TIMEZONE UTC\n" >> Dockerfil
 	echo -e "RUN yum clean all\n" >> Dockerfile
         for package in `ls ../ops/`;
 	do
 		echo -e "RUN yum -y install $package; yum clean all\n" >> Dockerfile
+=======
+	echo -e "RUN rpmdb --rebuilddb; rpmdb --initdb; yum clean all #$test" >> Dockerfile
+	echo -e "RUN yum -y install \\" >> Dockerfile
+	for package in `ls ../ops/`;
+	do
+		echo -e "    $package \\" >> Dockerfile
+>>>>>>> a7bf45cb3b7323469450a67110f94a6a945105b6
 	done
+	echo -e "; yum clean all; ls -la /etc/httpd/ #$test" >> Dockerfile
 	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\n" >> Dockerfile
-
 }
 
 dockerdirs() {
-
 	for directory in `find ./ops/ -mindepth 2 -type d | cut -d/ -f4-`;
 	do
 		if [ ! -d /etc/$directory ];
@@ -62,13 +79,20 @@ dockerdirs() {
 			echo "RUN mkdir -p /etc/$directory\n" >> Dockerfile
 		fi
 	done
+	echo -e "RUN mkdir -p /var/log/httpd\n" >> Dockerfile
 	for configfile in `find ./ops/ -mindepth 2 -type f`;
 	do
 		target=`echo $configfile | cut -d/ -f4- | sed 's|^|/etc\/|g'`
+<<<<<<< HEAD
 		echo "COPY $configfile $target\n" >> Dockerfile
 	done
 	echo -e "EXPOSE 80 443\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]\n" >> Dockerfile
 
+=======
+		echo "ADD $configfile $target" >> Dockerfile
+	done
+	echo -e "ENV container docker\nENV DATE_TIMEZONE UTC\nEXPOSE 80\nVOLUME $wwwpath2sub /etc\nUSER root\nCMD [\"/usr/bin/supervisord\", \"-n\", \"-c/etc/supervisor.d/supervisord.conf\"]" >> Dockerfile
+>>>>>>> a7bf45cb3b7323469450a67110f94a6a945105b6
 }
 
 dockervhost() {
@@ -80,7 +104,6 @@ vhostcreate() {
 }
 
 imageprep() {
-
 	cp -rp ../ops/ ./
 	for shortname2sub in `ls -d ../dev/* | grep root | awk -F '_' '{print $2}'`;
 	do
@@ -89,7 +112,6 @@ imageprep() {
 		dockervhost
 	done
 	rm -f $vhosttmpldir/vhosts.conf
-
 }
 
 helpers() {
