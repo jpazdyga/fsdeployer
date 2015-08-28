@@ -26,7 +26,7 @@ getappcode() {
 	then
 		giturl=`echo "$giturl" | sed -e 's/github.com:/github.com\//g' -e 's/git@/https:\/\//g'`
 	else
-		gitcheck=`git clone git@github.com:jpazdyga/testapp.git 2>1 > /dev/null ; echo $?`
+		gitcheck=`git clone $giturl 2>1 > /dev/null ; echo $?`
 		echo "Git protocol test result: $gitcheck"
 		if [ "$gitcheck" -ne "0" ];
 		then
@@ -112,16 +112,18 @@ then
 	helpmsg
 	exit 1
 else
-	if [ `echo $3 | grep "\-\-helpers"` ];
-	then
-		hlist=`echo $3 | cut -d'=' -f2`
-		helpers
-	else
-		helpmsg
+	if [ ! -z "$3" ]
+	then 
+		if [ `echo $3 | grep "\-\-helpers"` ];
+		then
+			hlist=`echo $3 | cut -d'=' -f2`
+			helpers
+		else
+			helpmsg
+		fi
 	fi
 fi
 
-exit 0
 getappcode
 dockeros
 imageprep
