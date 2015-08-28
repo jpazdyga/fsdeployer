@@ -1,12 +1,5 @@
 #!/bin/bash
 
-if [ -z "$1" ];
-then
-	echo "Please specify git url to clone as first argument and a domain name as a second:"
-	echo "$0 git@github.com:jpazdyga/testapp.git pazdyga.pl"
-	exit 1
-fi
-
 email2sub="jakub.pazdyga@ft.com"
 maintainer="Jakub Pazdyga <$email2sub>"
 giturl="$1"
@@ -99,6 +92,29 @@ imageprep() {
 
 }
 
+helpers() {
+	echo "We need to deploy $hlist server as well!"
+}
+
+helpmsg() {
+	echo -e "\nPlease specify git url to clone as first argument and a domain name as a second:\n$0 git@github.com:jpazdyga/testapp.git pazdyga.pl\n"
+}
+
+if [ -z "$1" ] || [ -z "$2" ];
+then
+	helpmsg
+	exit 1
+else
+	if [ `echo $3 | grep "\-\-helpers"` ];
+	then
+		hlist=`echo $3 | cut -d'=' -f2`
+		helpers
+	else
+		helpmsg
+	fi
+fi
+
+exit 0
 getappcode
 dockeros
 imageprep
