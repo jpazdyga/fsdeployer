@@ -12,6 +12,12 @@ cleanup() {
 	cat /dev/null > Dockerfile
 }
 
+bootstrap() {
+	bootstrap=`find ../ops/ -mindepth 2 -type f | grep $helper | grep bootstrap.sh`
+        echo "Bootstrap: $bootstrap"
+        docker exec -i $helper-$shortname2sub bash < $bootstrap
+}
+
 dockerbake() {
 	sudo docker build --no-cache=true -t apache-$shortname2sub-img .
 	sudo docker run --name apache-$shortname2sub -d -p 80:80 apache-$shortname2sub-img
@@ -19,9 +25,7 @@ dockerbake() {
 	do
 		#TODO: listen port as variable from somewhere:
 		sudo docker run --name $helper-$shortname2sub -d -p 3306:3306 jpazdyga/$helper
-		bootstrap=`find ../ops/ -mindepth 2 -type f | grep $helper | grep bootstrap.sh`
-		echo "Bootstrap: $bootstrap"
-		docker exec -i $helper-$shortname2sub bash < $bootstrap
+		bootstrap
 	done
 	cleanup
 	cd ..
