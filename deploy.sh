@@ -112,6 +112,7 @@ helpers() {
 helperslist() {
 	echo -e "mariadb\n"
 	echo -e "Please declare if you want to deploy the helper of your choice by:\n$0 git@github.com:jpazdyga/testapp.git pazdyga.pl --helpers=mariadb\n"
+	exit 0
 }
 
 helpmsg() {
