@@ -19,7 +19,7 @@ dockerbake() {
 	do
 		#TODO: listen port as variable from somewhere:
 		sudo docker run --name $helper-$shortname2sub -d -p 3306:3306 jpazdyga/$helper
-		bootstrap=`find ./ops/ -mindepth 2 -type f | grep $helper | grep bootstrap.sh`
+		bootstrap=`find ../ops/ -mindepth 2 -type f | grep $helper | grep bootstrap.sh`
 		docker exec -i $helper-$shortname2sub bash < $bootstrap
 	done
 	cleanup
