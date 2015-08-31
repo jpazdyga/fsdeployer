@@ -19,6 +19,8 @@ dockerbake() {
 	do
 		#TODO: listen port as variable from somewhere:
 		sudo docker run --name $helper-$shortname2sub -d -p 3306:3306 jpazdyga/$helper
+		bootstrap=`find ./ops/ -mindepth 2 -type f | grep $helper | grep bootstrap.sh`
+		docker exec -i $helper-$shortname2sub bash < $bootstrap
 	done
 	cleanup
 	cd ..
@@ -76,7 +78,7 @@ dockerdirs() {
 		fi
 	done
 	echo -e "RUN mkdir -p /var/log/httpd\n" >> Dockerfile
-	for configfile in `find ./ops/ -mindepth 2 -type f`;
+	for configfile in `find ./ops/ -mindepth 2 -type f | egrep -v 'bootstrap|\.sql'`;
 	do
 		target=`echo $configfile | cut -d/ -f4- | sed 's|^|/etc\/|g'`
 		echo "ADD $configfile $target" >> Dockerfile
@@ -109,7 +111,7 @@ helpers() {
 
 helperslist() {
 	echo -e "mariadb\n"
-	echo -e "Please decale you want do deploy the helper of your choice by:\n$0 git@github.com:jpazdyga/testapp.git pazdyga.pl --helpers=mariadb\n"
+	echo -e "Please declare if you want to deploy the helper of your choice by:\n$0 git@github.com:jpazdyga/testapp.git pazdyga.pl --helpers=mariadb\n"
 }
 
 helpmsg() {
