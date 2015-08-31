@@ -103,7 +103,8 @@ helpers() {
 }
 
 helpmsg() {
-	echo -e "\nPlease specify git url to clone as first argument and a domain name as a second:\n$0 git@github.com:jpazdyga/testapp.git pazdyga.pl\n"
+	echo -e "\nPlease specify git url to clone as first argument, domain name as a second and (optionally) helper name:\n$0 git@github.com:jpazdyga/testapp.git pazdyga.pl\n \
+		List of available helpers is available by: $0 list helpers.\n"
 }
 
 if [ -z "$1" ] || [ -z "$2" ];
