@@ -102,9 +102,13 @@ helpers() {
 	echo "We need to deploy $hlist server as well!"
 }
 
+helperslist() {
+	echo -e "mariadb\n"
+	echo -e "Please decale you want do deploy the helper of your choice by:\n$0 git@github.com:jpazdyga/testapp.git pazdyga.pl --helpers=mariadb\n"
+}
+
 helpmsg() {
-	echo -e "\nPlease specify git url to clone as first argument, domain name as a second and (optionally) helper name:\n$0 git@github.com:jpazdyga/testapp.git pazdyga.pl\n \
-		List of available helpers is available by: $0 list helpers.\n"
+	echo -e "\nPlease specify git url to clone as first argument, domain name as a second and (optionally) helper name:\n$0 git@github.com:jpazdyga/testapp.git pazdyga.pl\nList of available helpers is available by: $0 --helpers list.\n"
 }
 
 if [ -z "$1" ] || [ -z "$2" ];
@@ -124,6 +128,17 @@ else
 	fi
 fi
 
+case $1 in
+	--helpers)
+		echo -e "\nList of helper you can use to get your app running:\n"
+		helperslist
+	;;
+	*)
+		echo "Proceed"
+	;;
+esac
+	
+exit 0
 getappcode
 dockeros
 imageprep
