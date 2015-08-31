@@ -13,12 +13,12 @@ cleanup() {
 }
 
 dockerbake() {
-	sudo docker build --no-cache=true -t apache_$shortname2sub-img .
-	sudo docker run --name apache_$shortname2sub -d -p 80:80 apache_$shortname2sub-img
+	sudo docker build --no-cache=true -t apache-$shortname2sub-img .
+	sudo docker run --name apache-$shortname2sub -d -p 80:80 apache-$shortname2sub-img
 	for helper in $hlist;
 	do
 		#TODO: listen port as variable from somewhere:
-		sudo docker run --name $helper_$shortname2sub -d -p 3306:3306 jpazdyga/$helper
+		sudo docker run --name $helper-$shortname2sub -d -p 3306:3306 jpazdyga/$helper
 	done
 	cleanup
 	cd ..
