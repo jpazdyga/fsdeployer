@@ -65,13 +65,13 @@ dockeros() {
 	test="test1"
 	echo -e "FROM jpazdyga/centos7-base\nMAINTAINER $maintainer\n" > Dockerfile
 	echo -e "ENV container docker\n" >> Dockerfile
-	echo -e "VOLUME /etc $wwwpath2sub /var/log\nENV DATE_TIMEZONE UTC\n" >> Dockerfil
 	echo -e "RUN yum clean all\n" >> Dockerfile
         for package in `ls ../ops/`;
 	do
 		echo -e "RUN yum -y install $package; yum clean all\n" >> Dockerfile
 	done
-	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\n" >> Dockerfile
+	hostip=`ip addr show eth0 | grep -w inet | awk '{print $2}' | cut -d'/' -f1`
+	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\nRUN bash -c 'echo $hostip dbhost\n" >> Dockerfile
 }
 
 dockerdirs() {
