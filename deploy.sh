@@ -19,14 +19,14 @@ bootstrap() {
 }
 
 dockerbake() {
-	sudo docker build --no-cache=true -t apache-$shortname2sub-img .
-	sudo docker run --name apache-$shortname2sub -d -p 80:80 apache-$shortname2sub-img
 	for helper in $hlist;
 	do
 		#TODO: listen port as variable from somewhere:
 		sudo docker run --name $helper-$shortname2sub -d -p 3306:3306 jpazdyga/$helper
 		bootstrap
 	done
+	sudo docker build --no-cache=true -t apache-$shortname2sub-img .
+	sudo docker run --name apache-$shortname2sub -d -p 80:80 apache-$shortname2sub-img
 	cleanup
 	cd ..
 }
