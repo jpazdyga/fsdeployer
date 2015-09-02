@@ -19,6 +19,10 @@ bootstrap() {
 }
 
 dockerbake() {
+	if [ -z "$hlist" ];
+        then
+                hlist=`find ../ops/ -mindepth 1 -type d | grep $availhlp | awk -F '/' '{print $NF}'`
+        fi
 	for helper in $hlist;
 	do
 		#TODO: listen port as variable from somewhere:
@@ -27,8 +31,6 @@ dockerbake() {
 	done
 	sudo docker build --no-cache=true -t apache-$shortname2sub-img .
 	sudo docker run --name apache-$shortname2sub -d -p 80:80 apache-$shortname2sub-img
-	cleanup
-	cd ..
 }
 
 getappcode() {
@@ -115,7 +117,7 @@ helpers() {
 }
 
 helperslist() {
-	echo -e "mariadb\n"
+	echo -e "$availhlp\n"
 	echo -e "Please declare if you want to deploy the helper of your choice by:\n$0 git@github.com:jpazdyga/testapp.git pazdyga.pl --helpers=mariadb\n"
 	exit 0
 }
@@ -123,6 +125,9 @@ helperslist() {
 helpmsg() {
 	echo -e "\nPlease specify git url to clone as first argument, domain name as a second and (optionally) helper name:\n$0 git@github.com:jpazdyga/testapp.git pazdyga.pl\nList of available helpers is available by: $0 --helpers list.\n"
 }
+
+### List of helpers available. MariaDB is sufficent for the standard and taxonomy development ###
+availhlp="mariadb"
 
 if [ -z "$1" ] || [ -z "$2" ];
 then
