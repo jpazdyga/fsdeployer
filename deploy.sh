@@ -32,7 +32,7 @@ dockerbake() {
 }
 
 getappcode() {
-	subdir=`echo \"$giturl\" | awk -F'/' '{print \$NF}' | cut -d. -f1`
+	subdir=`echo \"$giturl\" | awk -F'/' '{print \$NF}' | cut -d. -f1 | sed 's/\"//g'`
 	gitproto=`ncat -i0.2 -w1 --send-only github.com 9418 2>&1 | grep "timed out"`
 	if [ ! -z "$gitproto" ];
 	then
