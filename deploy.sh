@@ -73,7 +73,7 @@ dockeros() {
 		echo -e "RUN yum -y install $package; yum clean all\n" >> Dockerfile
 	done
 	hostip=`ip addr show eth0 | grep -w inet | awk '{print $2}' | cut -d'/' -f1`
-	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\nRUN bash -c 'echo $hostip dbhost\n" >> Dockerfile
+	echo -e "COPY supervisord.conf /etc/supervisor.d/supervisord.conf\nRUN bash -c 'echo $hostip dbhost' > /etc/hosts'\n" >> Dockerfile
 }
 
 dockerdirs() {
