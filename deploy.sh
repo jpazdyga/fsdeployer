@@ -30,7 +30,7 @@ dockerbake() {
 		bootstrap
 	done
 	sudo docker build --no-cache=true -t apache-$shortname2sub-img .
-	sudo docker run --name apache-$shortname2sub -d -p 80:80 apache-$shortname2sub-img
+	sudo docker run --name apache-$shortname2sub -d -p 80:80 --add-host dbhost:$hostip apache-$shortname2sub-img
 }
 
 getappcode() {
@@ -64,7 +64,6 @@ getappcode() {
 dockeros() {
 	cd docker
 	cleanup
-	test="test1"
 	echo -e "FROM jpazdyga/centos7-base\nMAINTAINER $maintainer\n" > Dockerfile
 	echo -e "ENV container docker\n" >> Dockerfile
 	echo -e "RUN yum clean all\n" >> Dockerfile
